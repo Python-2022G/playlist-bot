@@ -1,7 +1,9 @@
-from telegram.ext import Updater, CommandHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import os
 from playlist.callbacks import (
     start,
+    choose_playlist_name,
+    add_playlist,
 )
 
 TOKEN = os.environ['TOKEN']
@@ -11,6 +13,8 @@ def main():
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(MessageHandler(Filters.text('🎵 Add Playlist'), choose_playlist_name))
+    dp.add_handler(MessageHandler(Filters.text, add_playlist))
 
     updater.start_polling()
     updater.idle()
