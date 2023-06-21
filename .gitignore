@@ -176,6 +176,8 @@ pyrightconfig.json
 # local db.json
 db.json
 /db.json
+/db
+db
 
 ### venv ###
 # Virtualenv
