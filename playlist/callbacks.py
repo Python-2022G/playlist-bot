@@ -4,11 +4,15 @@ from playlist.db import (
     UsersDB,
     ConfigDB,
     PlaylistsDB,
+    TracksDB,
+    PlaylistTracksDB,
 )
 
 usersDB = UsersDB()
 configDB = ConfigDB()
 playlistsDB = PlaylistsDB()
+tracksDB = TracksDB()
+playlistTracksDB = PlaylistTracksDB()
 
 
 def start(update: Update, context: CallbackContext) -> None:
@@ -92,16 +96,37 @@ def add_track(update: Update, context: CallbackContext):
     user = update.effective_user
     # get playlist
     playlists = playlistsDB.get_playlists(user.id)
+    # get track file id
+    track_file_id = update.message.audio.file_id
+    # add track to db
+    track = tracksDB.add(user_id=user.id, file_id=track_file_id)
     # send playlists
     inline_keyboards = []
     for playlist in playlists:
         inline_keyboards.append([InlineKeyboardButton(
             playlist['name'], 
-            callback_data=f'playlist:{playlist["name"]}')]
+            callback_data=f'addT:{playlist["name"]}-{track}')]
         )
     # forward to message
     update.message.reply_html(
         'Select a playlist to add a track:',
         reply_markup=InlineKeyboardMarkup(inline_keyboards),
         reply_to_message_id=update.message.message_id
+    )
+
+
+def insert_track(update: Update, context: CallbackContext):
+    # get user from update
+    user = update.effective_user
+    # get playlist name and track id
+    playlist_name, track_id = update.callback_query.data.split(':')[1].split('-')
+    # get track
+    track = tracksDB.get_track(track_id)
+    # insert track
+    playlistTracksDB.add(playlist_name, track_id)
+    # delete message
+    update.callback_query.message.delete()
+    # send message
+    update.callback_query.message.reply_html(
+        f"Track added to playlist <b>{playlist_name}</b>!",
     )

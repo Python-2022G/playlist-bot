@@ -58,8 +58,9 @@ class TracksDB:
     def is_track(self, track_id):
         return self.tracks.contains(doc_id=track_id)
 
-    def add(self, file_id):
+    def add(self, user_id, file_id):
         return self.tracks.insert({
+            'user_id': user_id,
             'file_id': file_id
         })
     

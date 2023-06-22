@@ -1,4 +1,4 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 import os
 from playlist.callbacks import (
     start,
@@ -6,6 +6,7 @@ from playlist.callbacks import (
     add_playlist,
     show_playlists,
     add_track,
+    insert_track,
 )
 
 TOKEN = os.environ['TOKEN']
@@ -19,6 +20,7 @@ def main():
     dp.add_handler(MessageHandler(Filters.text('📃 My Playlists'), show_playlists))
     dp.add_handler(MessageHandler(Filters.text, add_playlist))
     dp.add_handler(MessageHandler(Filters.audio, add_track))
+    dp.add_handler(CallbackQueryHandler(insert_track, pattern='addT:'))
 
     updater.start_polling()
     updater.idle()
