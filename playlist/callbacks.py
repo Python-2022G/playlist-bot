@@ -86,3 +86,24 @@ def show_playlists(update: Update, context: CallbackContext):
         reply_markup=InlineKeyboardMarkup(inline_keyboards)
     )
     
+
+def add_track(update: Update, context: CallbackContext):
+    # get user from update
+    user = update.effective_user
+    # get playlist
+    playlists = playlistsDB.get_playlists(user.id)
+    # send playlists
+    inline_keyboards = []
+    for playlist in playlists:
+        inline_keyboards.append([InlineKeyboardButton(
+            playlist['name'], 
+            callback_data=f'playlist:{playlist["name"]}')]
+        )
+    # forward to message
+    bot = context.bot
+    bot.send_message(
+        chat_id=update.message.chat_id,
+        text='Select a playlist',
+        reply_markup=InlineKeyboardMarkup(inline_keyboards),
+        reply_to_message_id=update.message.message_id
+    )

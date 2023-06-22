@@ -5,6 +5,7 @@ from playlist.callbacks import (
     choose_playlist_name,
     add_playlist,
     show_playlists,
+    add_track,
 )
 
 TOKEN = os.environ['TOKEN']
@@ -17,6 +18,7 @@ def main():
     dp.add_handler(MessageHandler(Filters.text('🎵 Add Playlist'), choose_playlist_name))
     dp.add_handler(MessageHandler(Filters.text('📃 My Playlists'), show_playlists))
     dp.add_handler(MessageHandler(Filters.text, add_playlist))
+    dp.add_handler(MessageHandler(Filters.audio, add_track))
 
     updater.start_polling()
     updater.idle()
