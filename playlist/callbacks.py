@@ -1,4 +1,4 @@
-from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
+from telegram import Update, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from playlist.db import (
     UsersDB,
@@ -54,11 +54,35 @@ def choose_playlist_name(update: Update, context: CallbackContext):
 def add_playlist(update: Update, context: CallbackContext):
     # get user from update
     user = update.effective_user
-    # add playlist
-    playlistsDB.add(user_id=user.id, name=update.message.text.strip().title())
-    # set config
-    configDB.set_config(user_id=user.id, status='start')
-    # send message
+    # check user config
+    config = configDB.show_config(user.id)
+    if config == 'create_playlist':
+        # add playlist
+        playlistsDB.add(user_id=user.id, name=update.message.text.strip().title())
+        # set config
+        configDB.set_config(user_id=user.id, status='start')
+        # send message
+        update.message.reply_html(
+            f"Playlist created successfully!",
+        )
+    else:
+        update.message.reply_html('siz  boshqa stage dasiz')
+
+
+def show_playlists(update: Update, context: CallbackContext):
+    # get user from update
+    user = update.effective_user
+    # get playlist
+    playlists = playlistsDB.get_playlists(user.id)
+    # send playlists
+    inline_keyboards = []
+    for playlist in playlists:
+        inline_keyboards.append([InlineKeyboardButton(
+            playlist['name'], 
+            callback_data=f'playlist:{playlist["name"]}')]
+        )
     update.message.reply_html(
-        f"Playlist created successfully!",
+        'Your playlists:',
+        reply_markup=InlineKeyboardMarkup(inline_keyboards)
     )
+    
