@@ -130,3 +130,18 @@ def insert_track(update: Update, context: CallbackContext):
     update.callback_query.message.reply_html(
         f"Track added to playlist <b>{playlist_name}</b>!",
     )
+
+
+def show_tracks(update: Update, context: CallbackContext):
+    # get user from update
+    user = update.effective_user
+    # get playlist name
+    playlist_name = update.callback_query.data.split(':')[1]
+    # get tracks
+    tracks = playlistTracksDB.get_playlist_tracks(playlist_name)
+    # send tracks
+    for track in tracks:
+        song = tracksDB.get_track(track['track_id'])
+        update.callback_query.message.reply_audio(
+            audio=song['file_id']
+        )
