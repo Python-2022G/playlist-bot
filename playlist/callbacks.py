@@ -100,10 +100,8 @@ def add_track(update: Update, context: CallbackContext):
             callback_data=f'playlist:{playlist["name"]}')]
         )
     # forward to message
-    bot = context.bot
-    bot.send_message(
-        chat_id=update.message.chat_id,
-        text='Select a playlist',
+    update.message.reply_html(
+        'Select a playlist to add a track:',
         reply_markup=InlineKeyboardMarkup(inline_keyboards),
         reply_to_message_id=update.message.message_id
     )
